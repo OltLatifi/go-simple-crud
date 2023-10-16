@@ -8,20 +8,29 @@ import (
 	"example/web-service-gin/models"
 )
 
-
-
-// routes
 func main() {
     //Database
 	db := config.ConnectDB()
-
 	db.Table("albums").AutoMigrate(&models.Album{})
+	db.Table("songs").AutoMigrate(&models.Song{})
 
     router := gin.Default()
-    router.GET("/albums", controllers.GetAlbums)
-    router.GET("/albums/:id", controllers.FindAlbum)
-	router.PUT("/albums/:id", controllers.UpdateAlbum)
-	router.POST("/albums", controllers.MakeAlbum)
+
+	albums := router.Group("/albums")
+	{
+		albums.GET("/", controllers.GetAlbums)
+		albums.GET("/:id", controllers.FindAlbum)
+		albums.PUT("/:id", controllers.UpdateAlbum)
+		albums.POST("/", controllers.MakeAlbum)
+	}
+
+	songs := router.Group("/songs")
+	{
+		// songs.GET("/", controllers.Getsongs)
+		// songs.PUT("/:id", controllers.UpdateAlbum)
+		songs.GET("/:id", controllers.FindSong)
+		songs.POST("/", controllers.MakeSong)
+	}
 
     router.Run("localhost:8000")
 }

@@ -16,7 +16,10 @@ func GetAlbums (c *gin.Context) {
 func MakeAlbum(c *gin.Context) {
 	var body struct {
 		Title string `json:"title" binding:"required"`
+		Songs []int `json:"songs"`
 	}
+
+	var songs []models.Song
 
 	err := c.Bind(&body)
 	if err != nil {
@@ -25,8 +28,8 @@ func MakeAlbum(c *gin.Context) {
 		})
 		return
 	}
-
-	album := models.Album{Title: body.Title}
+	config.DB.Where("id IN (?)", body.Songs).Find(&songs)
+	album := models.Album{Title: body.Title, Songs: songs}
 
 	result := config.DB.Create(&album)
 
